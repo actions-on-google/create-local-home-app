@@ -1,0 +1,38 @@
+{
+  "name": "create-local-home-app",
+  "version": "0.1.0",
+  "description": "Create Local Home SDK apps.",
+  "bin": "./main.js",
+  "author": "Google",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/array.prototype.flatmap": "^1.2.0",
+    "@types/node": "^12.0.8",
+    "@types/yargs": "^13.0.0",
+    "ava": "^2.1.0",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.17.0",
+    "typescript": "^3.5.2"
+  },
+  "scripts": {
+    "compile": "tsc --noEmit",
+    "build": "tsc",
+    "test": "ava",
+    "lint": "tslint --project .",
+    "start": "ts-node main.ts"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "dependencies": {
+    "array.prototype.flatmap": "^1.2.1",
+    "replace-in-file": "^4.1.1",
+    "yargs": "^13.2.4"
+  }
+}
