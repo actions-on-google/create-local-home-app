@@ -5,4 +5,4 @@ config.plugins.push(serve({
   contentBase: 'dist',
   port: 8080
 }))
-export default config;
+export default config
