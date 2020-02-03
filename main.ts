@@ -73,6 +73,7 @@ async function main() {
       }
     });
   });
+
   // copy files
   await Promise.all(filePairs.map(([srcFile, destFile]) => new Promise((resolve, reject) => {
     fs.copyFile(path.join(srcDir, srcFile),
@@ -80,11 +81,12 @@ async function main() {
                   if (errCopyFile !== null) {
                     console.error("error copying file:", srcFile, errCopyFile);
                     reject(errCopyFile);
-                    return;
+                  } else {
+                    resolve();
                   }
-                  resolve();
                 });
   })));
+
   // search and replace renamed files
   await Promise.all(filePairs
                     .filter(([srcFile, destFile]) => (srcFile !== destFile))
@@ -93,6 +95,7 @@ async function main() {
                       from: new RegExp(srcFile, "g"),
                       to: destFile,
                     })));
+
   // rewrite package.json deps and rules in-place.
   // note: use dest dir, since some content might be updated from the earlier step.
   await new Promise((resolve, reject) => {
@@ -106,6 +109,7 @@ async function main() {
         fs.writeFile(path.join(destDir, "package.json"),
                      JSON.stringify(packageJson, null, 4), (errWriteFile) => {
                        if (errWriteFile !== null) {
+                         console.error("error writing package file:", errWriteFile);
                          reject(errWriteFile);
                        } else {
                          resolve();
