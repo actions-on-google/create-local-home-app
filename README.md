@@ -13,6 +13,7 @@ with optional bundler support.
 ```
 npm init @google/local-home-app app/
 cd app
+npm install
 npm run build
 npm start
 ```
@@ -22,24 +23,10 @@ and begin serving the app from your local machine.
 
 ## Usage
 
-To create a new default app, choose one of the following methods:
-
-### npm
+To create a new Local Home app, run:
 
 ```
 npm init @google/local-home-app app/
-```
-
-### npx
-
-```
-npx @google/create-local-home-app app/
-```
-
-### yarn
-
-```
-yarn @google/local-home-app app/
 ```
 
 This will generate a new TypeScript project with the following structure:
@@ -55,20 +42,32 @@ app/
 └── .gitignore
 ```
 
-Open `index.ts` and begin adding your fulfillment code for the local home intents.
+Open `index.ts` and begin adding your fulfillment code for the Local Home intents.
 
 ## Built-in commands
 
 The generated project supports the following commands:
 
-#### `npm run build` or `yarn build`
+#### `npm run build`
 
 Compile the TypeScript source (optionally [bundling the JS](#bundler-support))
 and generate `index.html` for hosting the development app into `dist/`
 
-#### `npm start` or `yarn start`
+#### `npm start`
 
 Start a local development server with the files in `dist/`
+
+#### `npm test`
+
+Run ava tests from `test.ts`.
+
+#### `npm run compile`
+
+Check that TypeScript code compile without creating any output.
+
+#### `npm run lint`
+
+Check TypeScript files for common syntax and formatting issues.
 
 ## Bundler support
 
