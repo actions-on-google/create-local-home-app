@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019, Google, Inc.
  * Licensed under the Apache License, Version 2.0 (the 'License');
  * you may not use this file except in compliance with the License.
@@ -11,12 +11,16 @@
  * limitations under the License.
  */
 
-import "array.prototype.flatmap/auto";
-import test, {CbMacro} from "ava";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
-import { Bundler, filterFiles, filterPackages, IPackageJson } from "./index";
+
+import "array.prototype.flatmap/auto";
+import test, {Macro, CbMacro} from "ava";
 import { FullVersion } from "package-json";
+import * as yargs from "yargs";
+
+import { Bundler, filterFiles, filterPackages, IPackageJson, createLocal } from "./index";
 
 const testFilterPackages: CbMacro<[string]> = (t, selected: string) => {
   const excluded = Object.values(Bundler).filter((b) => b !== selected);
@@ -38,21 +42,21 @@ const testFilterPackages: CbMacro<[string]> = (t, selected: string) => {
     }
     t.assert(filteredPackageJson.scripts !== undefined);
     if (filteredPackageJson.scripts !== undefined) {
-      t.true('build' in filteredPackageJson.scripts);
-      t.true('start' in filteredPackageJson.scripts);
+      t.true("build" in filteredPackageJson.scripts);
+      t.true("start" in filteredPackageJson.scripts);
       if (selected !== Bundler.NONE) {
-        t.true(filteredPackageJson.scripts['build'].includes(selected));
-        t.true(filteredPackageJson.scripts['start'].includes(selected));
+        t.true(filteredPackageJson.scripts["build"].includes(selected));
+        t.true(filteredPackageJson.scripts["start"].includes(selected));
       }
       for (const s of Object.keys(filteredPackageJson.scripts)) {
-        t.false(s.includes('-'));
+        t.false(s.includes("-"));
       }
     }
     t.snapshot(filteredPackageJson);
     t.end();
   });
 };
-testFilterPackages.title = (providedTitle = 'filterPackages', bundler) => `${providedTitle} ${bundler}`;
+testFilterPackages.title = (providedTitle = "filterPackages", bundler) => `${providedTitle} ${bundler}`;
 
 for (const b of Object.values(Bundler)) {
   test.cb(testFilterPackages, b);
@@ -64,4 +68,27 @@ test("filterFiles", (t) => {
               [["webpack.config.js","webpack.config.js"],
                ["index.webpack.html", "index.template.html"],
                ["package.json", "package.json"]]);
+});
+
+test("createLocal npm install", async (t) => {
+  const projectDir = await new Promise<string>((resolve, reject) => {
+    fs.mkdtemp(path.join(os.tmpdir(), "create-local-app-"), (err, tmpDir) => {
+      if (err !== null) {
+        reject(err);
+      } else {
+        resolve(path.join(tmpDir, "app"));
+      }
+    });
+  });
+  await createLocal('none', path.join(__dirname, "app"), projectDir);
+  const stats = await new Promise<fs.Stats>((resolve, reject) => {
+    fs.stat(path.join(projectDir, "node_modules"), (errStat, stats) => {
+      if (errStat !== null) {
+        reject(errStat);
+      } else {
+        resolve(stats);
+      }
+    });
+  });
+  t.true(stats.isDirectory());
 });

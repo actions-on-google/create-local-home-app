@@ -11,10 +11,14 @@
  * limitations under the License.
  */
 
-import "array.prototype.flatmap/auto";
+import { spawn } from "child_process";
+import * as fs from "fs";
 import * as path from "path";
 
+import "array.prototype.flatmap/auto";
 import { FullVersion } from "package-json";
+import replace from "replace-in-file";
+import * as yargs from "yargs";
 
 type Writable<T> = {
     -readonly [K in keyof T]: Writable<T[K]>
@@ -27,6 +31,7 @@ export enum Bundler {
   PARCEL = "parcel",
   NONE = "none",
 }
+export const supportedBundlers = Object.values(Bundler);
 
 export function filterFiles(selectedTag: string, ...excludedTags: string[]) {
   return (f: string): Array<[string, string]> => {
@@ -73,4 +78,108 @@ export function filterPackages(packageJson: IPackageJson, selectedTag: string, .
     }
   }
   return packageJson;
+}
+
+export async function createLocal(selectedTag: string, srcDir: string, destDir: string) {
+  const excludedTags = supportedBundlers.filter((t) => t !== selectedTag);
+  // create app directory.
+  await new Promise((resolve, reject) => {
+    fs.mkdir(destDir, (errMkdir) => {
+      if (errMkdir !== null) {
+        console.error("error creating destination directory:", destDir, errMkdir);
+        reject(errMkdir);
+      } else {
+        resolve();
+      }
+    });
+  });
+  // get source files.
+  const files = await new Promise<string[]>((resolve, reject) => {
+    fs.readdir(srcDir, (errReaddir, entries) => {
+      if (errReaddir !== null) {
+        console.error("error reading source directory:", srcDir, errReaddir);
+        reject(errReaddir);
+      } else {
+        resolve(Promise.all(entries.map((entry) => new Promise<string[]>((res, rej) => {
+            fs.stat(path.join(srcDir, entry), (errStat, stats) =>  {
+              if (errStat !== null) {
+                console.error("error getting source file stats:", entry, errStat);
+                rej(errStat);
+              } else {
+                if (stats.isFile()) {
+                  res([entry]);
+                } else {
+                  res([]);
+                }
+              }
+            });
+        }))).then((result) => result.flatMap((x) => x)));
+      }
+    });
+  });
+  // filter files to copy.
+  const filePairs = files.flatMap(filterFiles(selectedTag, ...excludedTags));
+  // copy files
+  await Promise.all(filePairs.map(([srcFile, destFile]) => new Promise((resolve, reject) => {
+    fs.readFile(path.join(srcDir, srcFile), (errReadFile, data) => {
+      if (errReadFile !== null) {
+        console.error("error reading source file:", srcFile, errReadFile);
+        reject(errReadFile);
+      } else {
+        fs.writeFile(path.join(destDir, destFile), data, (errWriteFile) => {
+          if (errWriteFile !== null) {
+            console.error("error writing destination file:", destFile, errWriteFile);
+            reject(errWriteFile);
+          } else {
+            resolve();
+          }
+        });
+      }
+    });
+  })));
+  // search and replace renamed files
+  await Promise.all(filePairs
+                    .filter(([srcFile, destFile]) => (srcFile !== destFile))
+                    .map(([srcFile, destFile]) => replace({
+                      files: path.join(destDir, "*"),
+                      from: new RegExp(srcFile, "g"),
+                      to: destFile,
+                    })));
+  // rewrite package.json deps and rules in-place.
+  await new Promise((resolve, reject) => {
+    fs.readFile(path.join(destDir, "package.json"), (errReadFile, buf) => {
+      if (errReadFile !== null) {
+        console.error("error reading package file:", errReadFile);
+        reject(errReadFile);
+      } else {
+        const packageJson: IPackageJson = JSON.parse(buf.toString());
+        filterPackages(packageJson, selectedTag, ...excludedTags);
+        fs.writeFile(path.join(destDir, "package.json"),
+                     JSON.stringify(packageJson, null, 4), (errWriteFile) => {
+                       if (errWriteFile !== null) {
+                         console.error("error writing package file:", errWriteFile);
+                         reject(errWriteFile);
+                       } else {
+                         resolve();
+                       }
+                     });
+      }
+    });
+  });
+  // run npm install.
+  await new Promise((resolve, reject) => {
+    const npmInstall = spawn("npm", ["install", "--prefix", destDir], {stdio: "inherit"});
+    let errSpawn: Error;
+    npmInstall.on("error", (err) => {
+      errSpawn = err;
+    });
+    npmInstall.on("exit", (code, signal) => {
+      if (errSpawn || code !== 0 || signal !== null) {
+        console.error("npm install failed:", errSpawn, code, signal);
+        reject(errSpawn || new Error("npm install failed"));
+      } else {
+        resolve();
+      }
+    });
+  });
 }

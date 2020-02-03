@@ -13,7 +13,6 @@ with optional bundler support.
 ```
 npm init @google/local-home-app app/
 cd app
-npm install
 npm run build
 npm start
 ```

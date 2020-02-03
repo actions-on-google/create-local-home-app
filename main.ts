@@ -13,15 +13,12 @@
  * limitations under the License.
  */
 
-import * as fs from "fs";
 import * as path from "path";
 
-import replace from "replace-in-file";
 import * as yargs from "yargs";
 
-import { Bundler, filterFiles, filterPackages, IPackageJson } from "./index";
+import { createLocal, supportedBundlers } from "./index";
 
-const supportedBundlers = Object.values(Bundler);
 const argv = yargs
       .scriptName("create-local-home-sdk")
       .usage("$0 <destdir>",
@@ -42,82 +39,6 @@ const argv = yargs
       .demandOption(["destdir"])
       .argv;
 
-async function main() {
-  const selectedTag = argv.bundler as string;
-  const srcDir = argv.template as string;
-  const destDir = argv.destdir as string;
-  const excludedTags = supportedBundlers.filter((t) => t !== selectedTag);
-  // create app directory.
-  await new Promise((resolve, reject) => {
-    fs.mkdir(destDir, { recursive: true }, (errMkdir) => {
-      if (errMkdir !== null) {
-        console.error("error creating destination directory:", destDir, errMkdir);
-        reject(errMkdir);
-      } else {
-        resolve();
-      }
-    });
-  });
-
-  // filter files to copy.
-  const filePairs = await new Promise<Array<[string, string]>>((resolve, reject) => {
-    fs.readdir(srcDir, { withFileTypes: true }, (errReaddir, entries) => {
-      if (errReaddir !== null) {
-        console.error("error reading source directory:", srcDir, errReaddir);
-        reject(errReaddir);
-      } else {
-        resolve(entries
-                .filter((f) => f.isFile())
-                .map((f) => f.name)
-                .flatMap(filterFiles(selectedTag, ...excludedTags)));
-      }
-    });
-  });
-
-  // copy files
-  await Promise.all(filePairs.map(([srcFile, destFile]) => new Promise((resolve, reject) => {
-    fs.copyFile(path.join(srcDir, srcFile),
-                path.join(destDir, destFile), (errCopyFile) => {
-                  if (errCopyFile !== null) {
-                    console.error("error copying file:", srcFile, errCopyFile);
-                    reject(errCopyFile);
-                  } else {
-                    resolve();
-                  }
-                });
-  })));
-
-  // search and replace renamed files
-  await Promise.all(filePairs
-                    .filter(([srcFile, destFile]) => (srcFile !== destFile))
-                    .map(([srcFile, destFile]) => replace({
-                      files: path.join(destDir, "*"),
-                      from: new RegExp(srcFile, "g"),
-                      to: destFile,
-                    })));
-
-  // rewrite package.json deps and rules in-place.
-  // note: use dest dir, since some content might be updated from the earlier step.
-  await new Promise((resolve, reject) => {
-    fs.readFile(path.join(destDir, "package.json"), (errReadFile, buf) => {
-      if (errReadFile !== null) {
-        console.error("error reading package file:", errReadFile);
-        reject(errReadFile);
-      } else {
-        const packageJson: IPackageJson = JSON.parse(buf.toString());
-        filterPackages(packageJson, selectedTag, ...excludedTags);
-        fs.writeFile(path.join(destDir, "package.json"),
-                     JSON.stringify(packageJson, null, 4), (errWriteFile) => {
-                       if (errWriteFile !== null) {
-                         console.error("error writing package file:", errWriteFile);
-                         reject(errWriteFile);
-                       } else {
-                         resolve();
-                       }
-                     });
-      }
-    });
-  });
-}
-
-main();
+createLocal(argv.bundler as string,
+            argv.template as string,
+            argv.destdir as string);
