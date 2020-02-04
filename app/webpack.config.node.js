@@ -12,18 +12,14 @@
  */
 
 const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
+  target: 'node',
   entry: './index.ts',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist/node/'),
     filename: 'bundle.js'
-  },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    inline: false
   },
   module: {
     rules: [
@@ -36,9 +32,4 @@ module.exports = {
   resolve: {
     extensions: [ '.ts', '.js' ]
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'index.webpack.html'
-    })
-  ]
 }

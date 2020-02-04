@@ -4,7 +4,8 @@
     "moduleResolution": "node",
     "strict": true,
     "sourceMap": true,
-    "outDir" : "dist/"
+    "outDir": "dist/",
+    "outFile": "dist/bundle.js"
   },
   "files" : [
     "index.ts"

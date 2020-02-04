@@ -4,8 +4,6 @@ import commonjs from '@rollup/plugin-commonjs'
 import nodeBuiltins from 'rollup-plugin-node-builtins'
 import nodeGlobals from 'rollup-plugin-node-globals'
 
-import copy from 'rollup-plugin-copy'
-
 export default {
   input: './index.ts',
   plugins: [
@@ -13,14 +11,10 @@ export default {
     nodeBuiltins(),
     nodeGlobals(),
     resolve(),
-    commonjs(),
-    copy({
-      targets: [{ src: './index.rollup.html', dest: 'dist',
-                  rename: 'index.html' }]
-    })
+    commonjs()
   ],
   output: {
-    file: 'dist/bundle.js',
+    file: 'dist/web/bundle.js',
     format: 'iife'
   }
 }

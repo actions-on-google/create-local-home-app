@@ -42,14 +42,13 @@ const testFilterPackages: CbMacro<[string]> = (t, selected: string) => {
     }
     t.assert(filteredPackageJson.scripts !== undefined);
     if (filteredPackageJson.scripts !== undefined) {
-      t.true("build" in filteredPackageJson.scripts);
-      t.true("start" in filteredPackageJson.scripts);
+      t.true('build' in filteredPackageJson.scripts);
       if (selected !== Bundler.NONE) {
-        t.true(filteredPackageJson.scripts["build"].includes(selected));
-        t.true(filteredPackageJson.scripts["start"].includes(selected));
+        t.true(filteredPackageJson.scripts['build-web'].includes(selected));
+        t.true(filteredPackageJson.scripts['build-node'].includes(selected));
       }
       for (const s of Object.keys(filteredPackageJson.scripts)) {
-        t.false(s.includes("-"));
+        t.false(s.includes(`-${selected}`));
       }
     }
     t.snapshot(filteredPackageJson);
