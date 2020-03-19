@@ -18,7 +18,6 @@ import * as path from "path";
 import "array.prototype.flatmap/auto";
 import { FullVersion } from "package-json";
 import replace from "replace-in-file";
-import * as yargs from "yargs";
 
 type Writable<T> = {
     -readonly [K in keyof T]: Writable<T[K]>
@@ -26,7 +25,7 @@ type Writable<T> = {
 export type IPackageJson = Writable<FullVersion>;
 
 export enum Bundler {
-  WEBACK = "webpack",
+  WEBPACK = "webpack",
   ROLLUP = "rollup",
   PARCEL = "parcel",
   NONE = "none",

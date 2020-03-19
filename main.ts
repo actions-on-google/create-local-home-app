@@ -17,28 +17,37 @@ import * as path from "path";
 
 import * as yargs from "yargs";
 
-import { createLocal, supportedBundlers } from "./index";
+import { Bundler, createLocal, supportedBundlers } from "./index";
+
+const bundlerDescriptions = new Map<string, string>([
+  [Bundler.WEBPACK, "Bundle dependencies with Webpack"],
+  [Bundler.ROLLUP, "Bundle dependencies with Rollup"],
+  [Bundler.PARCEL, "Bundle dependencies with Parcel"],
+  [Bundler.NONE, "Compile TypeScript without bundling dependencies"],
+]);
 
 const argv = yargs
-      .scriptName("create-local-home-sdk")
-      .usage("$0 <destdir>",
-             "initialize Local Home SDK application",
+      .scriptName("create-local-home-app")
+      .usage("$0 <project-directory>",
+             "Initialize a new Local Home SDK application",
              (y: yargs.Argv) => {
-               return y.positional("destdir", {
-                 describe: "destination directory",
+               return y.positional("project-directory", {
+                 describe: "New project destination directory",
                });
              })
       .option("template", {
         default: path.join(__dirname, "app"),
+        hidden: true,
       })
       .option("bundler", {
         choices: supportedBundlers,
-        default: "none",
-        describe: "choose a bundler ",
+        describe: supportedBundlers.reduce((acc, current) => {
+          return acc + `${current}:\t${bundlerDescriptions.get(current)}\n`;
+        }, ""),
       })
-      .demandOption(["destdir"])
+      .demandOption("bundler", "You must choose a bundler option.")
       .argv;
 
 createLocal(argv.bundler as string,
             argv.template as string,
-            argv.destdir as string);
+            argv.projectDirectory as string);
