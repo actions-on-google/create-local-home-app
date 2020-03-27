@@ -15,39 +15,50 @@
 
 import * as path from "path";
 
-import * as yargs from "yargs";
+import yargs from "yargs";
 
-import { Bundler, createLocal, supportedBundlers } from "./index";
+import { Bundler, createLocal } from "./index";
 
-const bundlerDescriptions = new Map<string, string>([
-  [Bundler.WEBPACK, "Bundle dependencies with Webpack"],
-  [Bundler.ROLLUP, "Bundle dependencies with Rollup"],
-  [Bundler.PARCEL, "Bundle dependencies with Parcel"],
-  [Bundler.NONE, "Compile TypeScript without bundling dependencies"],
-]);
+interface ICreateLocalArgv {
+  projectDirectory?: string;
+  bundler: string;
+  template: string;
+}
 
-const argv = yargs
-      .scriptName("create-local-home-app")
-      .usage("$0 <project-directory>",
-             "Initialize a new Local Home SDK application",
-             (y: yargs.Argv) => {
-               return y.positional("project-directory", {
-                 describe: "New project destination directory",
-               });
-             })
-      .option("template", {
-        default: path.join(__dirname, "app"),
-        hidden: true,
-      })
-      .option("bundler", {
-        choices: supportedBundlers,
-        describe: supportedBundlers.reduce((acc, current) => {
-          return acc + `${current}:\t${bundlerDescriptions.get(current)}\n`;
-        }, ""),
-      })
-      .demandOption("bundler", "You must choose a bundler option.")
-      .argv;
-
-createLocal(argv.bundler as string,
-            argv.template as string,
-            argv.projectDirectory as string);
+const _ = yargs
+    .scriptName("create-local-home-app")
+    .usage("$0 [project-directory]",
+           "Initialize a new Local Home SDK application",
+           (y: yargs.Argv) => {
+             return y
+                 .positional("project-directory", {
+                   describe: "New project destination directory",
+                 })
+                 .option("template", {
+                   default: path.join(__dirname, "app"),
+                   hidden: true,
+                 })
+                 .option("bundler", {
+                   choices: Object.values(Bundler),
+                   demandOption: "You must choose a bundler configuration",
+                   describe: Object.entries({
+                     [Bundler.WEBPACK]: "Bundle dependencies with Webpack",
+                     [Bundler.ROLLUP]: "Bundle dependencies with Rollup",
+                     [Bundler.PARCEL]: "Bundle dependencies with Parcel",
+                     [Bundler.NONE]: "Compile TypeScript without bundling dependencies",
+                   }).reduce((acc, [bundler, desc]) => acc + `${bundler}:\t${desc}\n`,
+                             "Specify a bundler configuration\n"),
+                 });
+           }, (argv: ICreateLocalArgv) => {
+             if (argv.projectDirectory === undefined) {
+               yargs.showHelp();
+               console.error("Missing required positional argument: project-directory");
+               console.error("You must specificy a destination project directory");
+               process.exit(1);
+             }
+             createLocal(argv.bundler,
+                         argv.template,
+                         argv.projectDirectory);
+           })
+    .help()
+    .argv;

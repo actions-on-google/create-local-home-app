@@ -30,7 +30,6 @@ export enum Bundler {
   PARCEL = "parcel",
   NONE = "none",
 }
-export const supportedBundlers = Object.values(Bundler);
 
 export function filterFiles(selectedTag: string, ...excludedTags: string[]) {
   return (f: string): Array<[string, string]> => {
@@ -80,7 +79,7 @@ export function filterPackages(packageJson: IPackageJson, selectedTag: string, .
 }
 
 export async function createLocal(selectedTag: string, srcDir: string, destDir: string) {
-  const excludedTags = supportedBundlers.filter((t) => t !== selectedTag);
+  const excludedTags = Object.values(Bundler).filter((t) => t !== selectedTag);
   // create app directory.
   await new Promise((resolve, reject) => {
     fs.mkdir(destDir, (errMkdir) => {
