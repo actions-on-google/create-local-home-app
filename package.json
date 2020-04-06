@@ -5,6 +5,18 @@
   "bin": "./main.js",
   "author": "Google",
   "license": "Apache-2.0",
+  "scripts": {
+    "compile": "tsc --noEmit",
+    "build": "tsc",
+    "test": "ava test.ts",
+    "lint": "tslint --project .",
+    "start": "ts-node main.ts"
+  },
+  "dependencies": {
+    "array.prototype.flatmap": "^1.2.3",
+    "replace-in-file": "^4.3.1",
+    "yargs": "^13.3.0"
+  },
   "devDependencies": {
     "@types/array.prototype.flatmap": "^1.2.0",
     "@types/node": "^12.12.26",
@@ -14,13 +26,6 @@
     "tslint": "^5.20.1",
     "typescript": "^3.7.5"
   },
-  "scripts": {
-    "compile": "tsc --noEmit",
-    "build": "tsc",
-    "test": "ava test.ts",
-    "lint": "tslint --project .",
-    "start": "ts-node main.ts"
-  },
   "ava": {
     "extensions": [
       "ts"
@@ -28,10 +33,5 @@
     "require": [
       "ts-node/register"
     ]
-  },
-  "dependencies": {
-    "array.prototype.flatmap": "^1.2.3",
-    "replace-in-file": "^4.3.1",
-    "yargs": "^13.3.0"
   }
 }
