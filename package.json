@@ -1,10 +1,10 @@
 {
-  "name": "create-local-home-app",
+  "name": "@google/create-local-home-app",
   "version": "0.1.0",
   "description": "Create Local Home SDK apps.",
   "bin": "./main.js",
   "author": "Google",
-  "license": "Apache-2.0", 
+  "license": "Apache-2.0",
   "repository": "actions-on-google/create-local-home-app",
   "scripts": {
     "compile": "tsc --noEmit",
