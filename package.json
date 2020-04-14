@@ -1,14 +1,19 @@
 {
   "name": "@google/create-local-home-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create Local Home SDK apps.",
   "bin": "./main.js",
   "author": "Google",
   "license": "Apache-2.0",
   "repository": "actions-on-google/create-local-home-app",
+  "homepage": "https://github.com/actions-on-google/create-local-home-app#readme",
+  "bugs": {
+    "url": "https://github.com/actions-on-google/create-local-home-app/issues"
+  },
   "scripts": {
     "compile": "tsc --noEmit",
     "build": "tsc",
+    "prepare" : "npm run build",
     "test": "ava test.ts",
     "lint": "tslint --project .",
     "start": "ts-node main.ts"
@@ -27,6 +32,12 @@
     "tslint": "^5.20.1",
     "typescript": "^3.7.5"
   },
+  "files": [
+    "index.js",
+    "main.js",
+    "npm-shrinkwrap.json",
+    "app/*"
+  ],
   "ava": {
     "extensions": [
       "ts"

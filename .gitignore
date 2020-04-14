@@ -1,2 +1,8 @@
+# Dependency directories
 node_modules/
+# Build cache
 .cache/
+# Compiled output
+*.js
+# Output of 'npm pack'
+*.tgz
