@@ -3,6 +3,7 @@ node_modules/
 # Build cache
 .cache/
 # Compiled output
-*.js
+index.js
+main.js
 # Output of 'npm pack'
 *.tgz

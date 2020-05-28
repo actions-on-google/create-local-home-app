@@ -44,11 +44,14 @@ const testFilterPackages: CbMacro<[string]> = (t, selected: string) => {
     if (filteredPackageJson.scripts !== undefined) {
       t.true('build' in filteredPackageJson.scripts);
       if (selected !== Bundler.NONE) {
-        t.true(filteredPackageJson.scripts['build-web'].includes(selected));
-        t.true(filteredPackageJson.scripts['build-node'].includes(selected));
+        t.regex(filteredPackageJson.scripts['build-web'], new RegExp(selected));
+        t.regex(filteredPackageJson.scripts['build-node'], new RegExp(selected));
       }
       for (const s of Object.keys(filteredPackageJson.scripts)) {
-        t.false(s.includes(`-${selected}`));
+        t.notRegex(s, new RegExp(`-${selected}`));
+      }
+      for (const s of Object.values(filteredPackageJson.scripts)) {
+        t.notRegex(s, new RegExp(`\\.${selected}`));
       }
     }
     t.snapshot(filteredPackageJson);
@@ -62,10 +65,10 @@ for (const b of Object.values(Bundler)) {
 }
 
 test("filterFiles", (t) => {
-  const files = ["webpack.config.js", "index.webpack.html", "rollup.config.js", "package.json"];
+  const files = ["webpack.config.js", "serve.webpack.js", "rollup.config.js", "package.json"];
   t.deepEqual(files.flatMap(filterFiles("webpack", "rollup")),
               [["webpack.config.js","webpack.config.js"],
-               ["index.webpack.html", "index.template.html"],
+               ["serve.webpack.js", "serve.js"],
                ["package.json", "package.json"]]);
 });
 

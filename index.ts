@@ -42,7 +42,7 @@ export function filterFiles(selectedTag: string, ...excludedTags: string[]) {
     }
     // rename.
     if (basename.endsWith(`.${selectedTag}`)) {
-      return [[f, f.replace(`${selectedTag}`, "template")]];
+      return [[f, f.replace(`.${selectedTag}`, "")]];
     }
     // include.
     return [[f, f]];
@@ -70,7 +70,8 @@ export function filterPackages(packageJson: IPackageJson, selectedTag: string, .
       }
       // rename scripts.
       if (s.endsWith(`-${selectedTag}`)) {
-        packageJson.scripts[s.replace(`-${selectedTag}`, "")] = packageJson.scripts[s];
+        const script = packageJson.scripts[s].replace(`.${selectedTag}`, "");
+        packageJson.scripts[s.replace(`-${selectedTag}`, "")] = script;
         delete packageJson.scripts[s];
       }
     }
