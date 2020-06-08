@@ -17,7 +17,7 @@ const app = new smarthome.App("1.0.0")
           },
         },
       };
-      console.log("IDENTIFY response", response);
+      console.debug("IDENTIFY response", response);
       resolve(response);
     });
   })
@@ -32,7 +32,7 @@ const app = new smarthome.App("1.0.0")
       // TODO: send device command.
       // TODO: set response success/errorState.
     })).then(() => {
-      console.log("EXECUTE response", response);
+      console.debug("EXECUTE response", response);
       return response.build();
     });
   })
