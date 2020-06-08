@@ -12,12 +12,13 @@
  */
 
 import { spawn } from "child_process";
-import * as fs from "fs";
-import * as path from "path";
+import fs from "fs";
+import path from "path";
 
 import "array.prototype.flatmap/auto";
 import { FullVersion } from "package-json";
-import replace from "replace-in-file";
+
+import { replaceInFile } from "replace-in-file";
 
 type Writable<T> = {
     -readonly [K in keyof T]: Writable<T[K]>
@@ -32,7 +33,7 @@ export enum Bundler {
 }
 
 export function filterFiles(selectedTag: string, ...excludedTags: string[]) {
-  return (f: string): Array<[string, string]> => {
+  return (f: string): [string, string][] => {
     const basename = path.parse(f).name;
     // exclude.
     for (const excludedTag of excludedTags) {
@@ -139,7 +140,7 @@ export async function createLocal(selectedTag: string, srcDir: string, destDir: 
   // search and replace renamed files
   await Promise.all(filePairs
                     .filter(([srcFile, destFile]) => (srcFile !== destFile))
-                    .map(([srcFile, destFile]) => replace({
+                    .map(([srcFile, destFile]) => replaceInFile({
                       files: path.join(destDir, "*"),
                       from: new RegExp(srcFile, "g"),
                       to: destFile,

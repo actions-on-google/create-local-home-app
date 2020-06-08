@@ -3,7 +3,6 @@
     "target": "es2018",
     "moduleResolution": "node",
     "strict": true,
-    "sourceMap": true,
     "esModuleInterop": true
   },
   "files" : [

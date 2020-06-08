@@ -13,24 +13,24 @@
   "scripts": {
     "compile": "tsc --noEmit",
     "build": "tsc",
-    "prepare" : "npm run build",
+    "prepare": "npm run build",
     "test": "ava test.ts",
     "lint": "tslint --project .",
     "start": "ts-node main.ts"
   },
   "dependencies": {
     "array.prototype.flatmap": "^1.2.3",
-    "replace-in-file": "^4.3.1",
-    "yargs": "^13.3.0"
+    "replace-in-file": "^6.1.0",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
     "@types/array.prototype.flatmap": "^1.2.0",
-    "@types/node": "^12.12.26",
-    "@types/yargs": "^13.0.7",
-    "ava": "^3.4.0",
-    "ts-node": "^8.6.2",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.5"
+    "@types/node": "^14.0.11",
+    "@types/yargs": "^15.0.5",
+    "ava": "^3.8.2",
+    "ts-node": "^8.10.2",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.5"
   },
   "files": [
     "index.js",
