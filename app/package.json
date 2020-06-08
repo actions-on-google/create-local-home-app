@@ -14,7 +14,6 @@
     "rollup": "^2.14.0",
     "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-serve": "^1.0.1",
-    "shx": "^0.3.2",
     "ts-loader": "^7.0.5",
     "ts-node": "^8.10.2",
     "tslint": "^6.1.2",
