@@ -1,7 +1,7 @@
 {
   "private": true,
   "dependencies": {
-    "@google/local-home-sdk": "^1.0.0"
+    "@google/local-home-sdk": "^1.4.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^13.0.0",
